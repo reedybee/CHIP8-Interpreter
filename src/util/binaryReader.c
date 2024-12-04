@@ -8,9 +8,14 @@ void CreateBinaryReader (struct BinaryReader* binaryReader, char* file, size_t f
     binaryReader->nibble_flag = 0;
 }
 
+void AdvancePointer(struct BinaryReader* binaryReader, int numberToAdvance) {
+    binaryReader->pointer += numberToAdvance;
+}
+
+
 char ReadNibble(struct BinaryReader* binaryReader) {
     if (binaryReader->pointer >= binaryReader->buffer_size) {
-        printf("Pointer has reached end of file");
+        printf("\nPointer has reached end of file\n");
         binaryReader->eob = 1;
         return -1;
     }
@@ -48,4 +53,41 @@ char ReadSpecifiedNibble(struct BinaryReader* binaryReader, unsigned int pointer
     }
 
     return nibble;
+}
+
+char ReadByte(struct BinaryReader* binaryReader) {
+    if (binaryReader->pointer >= binaryReader->buffer_size) {
+        printf("Pointer has reached end of file");
+        binaryReader->eob = 1;
+        return -1;
+    }
+
+    char byte = binaryReader->buffer[binaryReader->pointer];
+
+    return byte;
+}
+
+char ReadNextByte(struct BinaryReader* binaryReader) {
+        if (binaryReader->pointer >= binaryReader->buffer_size) {
+        printf("Pointer has reached end of file");
+        binaryReader->eob = 1;
+        return -1;
+    }
+
+    char byte = binaryReader->buffer[binaryReader->pointer + 1];
+
+    return byte;
+}
+
+short ReadDoubleByte(struct BinaryReader* binaryReader) {
+
+    unsigned char current_byte = ReadByte(binaryReader);
+    unsigned char next_byte = ReadNextByte(binaryReader);
+
+    short double_byte;
+
+    double_byte = current_byte;
+    double_byte = (current_byte << 8) | next_byte;
+
+    return double_byte;
 }

@@ -1,0 +1,2 @@
+#define CLEAR_SCREEN 0x00E0
+#define RETURN 0x00EE

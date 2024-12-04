@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     FILE* file = fopen("src/pong.rom", "rb");
 
     if (file == NULL) {
-        printf("FAiled to open file\n");
+        printf("Failed to open file\n");
     }
 
     fseek(file, 0L, SEEK_END);    
@@ -24,7 +24,11 @@ int main(int argc, char* argv[]) {
     struct BinaryReader binaryReader;
     CreateBinaryReader(&binaryReader, buffer, length);
 
-    InterperateROM(&binaryReader);    
+    struct Interpreter interpreter;
+
+    CreateInterpreter(&interpreter);
+
+    InterperateROM(&interpreter, &binaryReader);    
 
     fclose(file);
     free(buffer);
