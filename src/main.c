@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 
     CreateInterpreter(&interpreter);
 
-    InterperateROM(&interpreter, &binaryReader);    
+    InterpreteROM(&interpreter, &binaryReader);    
 
     fclose(file);
     free(buffer);

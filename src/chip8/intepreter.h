@@ -7,11 +7,11 @@
 #include "chip8/optcode.h"
 
 struct Interpreter {
-    
+    // 0xF00 - 0xFFF is for display
     unsigned char* memory;
     
     unsigned char PC; // program counter 
-    unsigned char I; // 12bit register
+    unsigned short I; // 12bit register
 
     unsigned char V0; // register 0char V0; // register 0
     unsigned char V1; // register 1char V1; // register 1
@@ -35,10 +35,14 @@ struct Interpreter {
 
 void CreateInterpreter(struct Interpreter* interpreter);
 
-void InterperateROM(struct Interpreter* interpreter, struct BinaryReader* binaryReader);
+void InterpreteROM(struct Interpreter* interpreter, struct BinaryReader* binaryReader);
 
 void SetVariable(struct Interpreter* interpreter, char variable, char value);
 
-void SetMemoryPointer(struct Interpreter *interpreter, char pointer);
+char ReadVariable(struct Interpreter* interpreter, char variable);
+
+void SetMemoryPointer(struct Interpreter *interpreter, short pointer);
+
+void DrawSprite(char x, char y, char height);
 
 #endif

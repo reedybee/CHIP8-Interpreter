@@ -25,11 +25,11 @@ char ReadNibble(struct BinaryReader* binaryReader);
 // reads the what_nibble at pointer where what_nibble = 0 is low, 1 is high;
 char ReadSpecifiedNibble(struct BinaryReader* binaryReader, unsigned int pointer, unsigned int what_nibble);
 
-// reads current byte, does not advance pointer
-char ReadByte(struct BinaryReader* binaryReader);
+//
+short ReadTribble(struct BinaryReader* binaryReader);
 
-// reads next byte, does not advance pointer
-char ReadNextByte(struct BinaryReader* binaryReader);
+// reads byte
+char ReadByte(struct BinaryReader* binaryReader);
 
 // reads current double byte, does not advance pointers
 short ReadDoubleByte(struct BinaryReader* binaryReader);

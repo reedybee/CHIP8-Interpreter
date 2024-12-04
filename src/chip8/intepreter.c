@@ -22,13 +22,30 @@ void CreateInterpreter(struct Interpreter* interpreter) {
     interpreter->VF = 0;    interpreter->variable_addresses[0xF] = &interpreter->VF;
 }
 
-void InterperateROM(struct Interpreter* interpreter, struct BinaryReader* binaryReader) {
+void InterpreteROM(struct Interpreter* interpreter, struct BinaryReader* binaryReader) {
     while (binaryReader->eob == 0) {
         
         unsigned char nibble = ReadNibble(binaryReader);
 
         if (nibble == -1)
             return;
+
+        if (nibble == 0xA) {
+            short memory_pointer = ReadTribble(binaryReader);
+
+            SetMemoryPointer(interpreter, memory_pointer);
+        }
+        if (nibble == 0xB) {
+            short memory_pointer = interpreter->I + ReadVariable(interpreter, 0x0); 
+
+            SetMemoryPointer(interpreter, memory_pointer);
+        }
+        if (nibble == 0xC) {
+            char variable = ReadNibble(binaryReader);
+            char number = ReadByte(binaryReader);
+
+            SetVariable(interpreter, variable, ((rand() % 255 - 0 + 1) + 1) & number);
+        }
 
         if (nibble == 0x6) {
             unsigned char variable = ReadNibble(binaryReader);
@@ -40,20 +57,39 @@ void InterperateROM(struct Interpreter* interpreter, struct BinaryReader* binary
 
             SetVariable(interpreter, variable, value);
         }
-        if (nibble == 0xA) {
-            
+        if (nibble == 0xD) {
+            //display
+            unsigned char x_pos = ReadVariable(interpreter, ReadNibble(binaryReader));
+            unsigned char y_pos = ReadVariable(interpreter, ReadNibble(binaryReader));
+
+            unsigned char height = ReadNibble(binaryReader);
+
+            DrawSprite(x_pos, y_pos, height);
         }
     }
-
-    
 }
 
 void SetVariable(struct Interpreter* interpreter, char variable, char value) {   
-            *interpreter->variable_addresses[variable] = value;
+    *interpreter->variable_addresses[variable] = value;
 
-            printf("Variable %X set to %02X\n", variable, (int)*interpreter->variable_addresses[memory_address]);
+    printf("Variable %X set to %02X\n", variable, (int)*interpreter->variable_addresses[variable]);
 }
 
-void SetMemoryPointer(struct Interpreter *interpreter, char pointer) {
+char ReadVariable(struct Interpreter* interpreter, char variable) {
+    char value = *interpreter->variable_addresses[variable];
 
+    printf("Variable %X read as %02X\n", variable, value);
+
+    return value;
+}
+
+void SetMemoryPointer(struct Interpreter *interpreter, short pointer) {
+    interpreter->I = pointer;
+
+    printf("Memory pointer set to: %X\n", pointer);
+}
+
+void DrawSprite(char x, char y, char height) {
+    //
+    printf("Sprite drawn at (%X, %X)\n", x, y);
 }
