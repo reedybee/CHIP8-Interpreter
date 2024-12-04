@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-enum { CHAR };
+#include "util/binaryReader.h"
+
+#include "chip8/intepreter.h"
 
 int main(int argc, char* argv[]) {
 
@@ -15,23 +17,14 @@ int main(int argc, char* argv[]) {
     int length = ftell(file);
     rewind(file);
 
-    char* buffer = malloc(247);
+    char* buffer = malloc(length + 1);
 
     fread(buffer, length, 1, file);
 
-    /*
-    // for (int i = 0; i < length; i++) {
-    //     if (i % 1 == 0) {
-    //         printf(" ");
-    //     }
-    //     if (i % 16 == 0) {
-    //         printf("\n");
-    //     }
-    //     printf("%02X", (unsigned int)(buffer[i] & 0xFF));
-    // }
-    */
+    struct BinaryReader binaryReader;
+    CreateBinaryReader(&binaryReader, buffer, length);
 
-   
+    InterperateROM(&binaryReader);    
 
     fclose(file);
     free(buffer);
