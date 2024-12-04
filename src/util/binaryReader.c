@@ -54,21 +54,6 @@ char ReadSpecifiedNibble(struct BinaryReader* binaryReader, unsigned int pointer
     return nibble;
 }
 
-short ReadTribble(struct BinaryReader* binaryReader) {
-    unsigned char first_nibble = ReadNibble(binaryReader);
-    unsigned char second_nibble = ReadNibble(binaryReader);
-    unsigned char third_nibble = ReadNibble(binaryReader); 
-
-    short tribble = first_nibble;
-
-    tribble <<= 4;
-    tribble |= second_nibble;
-    tribble <<= 4;
-    tribble |= third_nibble;
-
-    return tribble;
-}
-
 char ReadByte(struct BinaryReader* binaryReader) {
     if (binaryReader->pointer >= binaryReader->buffer_size) {
         printf("Pointer has reached end of file");

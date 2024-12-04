@@ -25,9 +25,6 @@ char ReadNibble(struct BinaryReader* binaryReader);
 // reads the what_nibble at pointer where what_nibble = 0 is low, 1 is high;
 char ReadSpecifiedNibble(struct BinaryReader* binaryReader, unsigned int pointer, unsigned int what_nibble);
 
-//
-short ReadTribble(struct BinaryReader* binaryReader);
-
 // reads byte
 char ReadByte(struct BinaryReader* binaryReader);
 

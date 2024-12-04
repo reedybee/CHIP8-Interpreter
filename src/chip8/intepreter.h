@@ -7,9 +7,10 @@
 #include "chip8/optcode.h"
 
 struct Interpreter {
+    // 0xEA0 - 0xEFF is for call stack and internals
     // 0xF00 - 0xFFF is for display
     unsigned char* memory;
-    
+
     unsigned char PC; // program counter 
     unsigned short I; // 12bit register
 
@@ -44,5 +45,7 @@ char ReadVariable(struct Interpreter* interpreter, char variable);
 void SetMemoryPointer(struct Interpreter *interpreter, short pointer);
 
 void DrawSprite(char x, char y, char height);
+
+void DestroyIntepreter(struct Interpreter* interpreter);
 
 #endif

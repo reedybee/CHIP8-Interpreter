@@ -1,7 +1,7 @@
 #include "chip8/intepreter.h"
 
 void CreateInterpreter(struct Interpreter* interpreter) {   
-    interpreter->memory = malloc(512);
+    interpreter->memory = malloc(4096);
     interpreter->PC = 0;
     interpreter->I = 0; 
     interpreter->V0 = 0;    interpreter->variable_addresses[0x0] = &interpreter->V0;
@@ -31,7 +31,7 @@ void InterpreteROM(struct Interpreter* interpreter, struct BinaryReader* binaryR
             return;
 
         if (nibble == 0xA) {
-            short memory_pointer = ReadTribble(binaryReader);
+            short memory_pointer = ReadByte(binaryReader);
 
             SetMemoryPointer(interpreter, memory_pointer);
         }
@@ -92,4 +92,8 @@ void SetMemoryPointer(struct Interpreter *interpreter, short pointer) {
 void DrawSprite(char x, char y, char height) {
     //
     printf("Sprite drawn at (%X, %X)\n", x, y);
+}
+
+void DestroyIntepreter(struct Interpreter* interpreter) {
+    free(interpreter->memory);
 }

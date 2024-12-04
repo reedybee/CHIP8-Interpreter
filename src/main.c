@@ -30,6 +30,8 @@ int main(int argc, char* argv[]) {
 
     InterpreteROM(&interpreter, &binaryReader);    
 
+    DestroyIntepreter(&interpreter);
+
     fclose(file);
     free(buffer);
     printf("\n");
