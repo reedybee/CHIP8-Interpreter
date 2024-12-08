@@ -69,13 +69,13 @@ void InterpreteROM(struct Interpreter* interpreter, struct BinaryReader* binaryR
     }
 }
 
-void SetVariable(struct Interpreter* interpreter, char variable, char value) {   
+void SetVariable(struct Interpreter* interpreter, uint8 variable, uint8 value) {   
     *interpreter->variable_addresses[variable] = value;
 
     printf("Variable %X set to %02X\n", variable, (int)*interpreter->variable_addresses[variable]);
 }
 
-char ReadVariable(struct Interpreter* interpreter, char variable) {
+uint8 ReadVariable(struct Interpreter* interpreter, uint8 variable) {
     char value = *interpreter->variable_addresses[variable];
 
     printf("Variable %X read as %02X\n", variable, value);
@@ -83,13 +83,13 @@ char ReadVariable(struct Interpreter* interpreter, char variable) {
     return value;
 }
 
-void SetMemoryPointer(struct Interpreter *interpreter, short pointer) {
+void SetMemoryPointer(struct Interpreter *interpreter, uint16 pointer) {
     interpreter->I = pointer;
 
     printf("Memory pointer set to: %X\n", pointer);
 }
 
-void DrawSprite(char x, char y, char height) {
+void DrawSprite(uint8 x, uint8 y, uint8 height) {
     //
     printf("Sprite drawn at (%X, %X)\n", x, y);
 }
