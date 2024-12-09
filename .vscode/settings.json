@@ -3,6 +3,7 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "binaryreader.h": "c",
-        "intepreter.h": "c"
+        "intepreter.h": "c",
+        "util.h": "c"
     }
 }

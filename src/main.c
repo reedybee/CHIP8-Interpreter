@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "util/binaryReader.h"
-
 #include "chip8/intepreter.h"
 
 int main(int argc, char* argv[]) {
@@ -21,16 +19,13 @@ int main(int argc, char* argv[]) {
 
     fread(buffer, length, 1, file);
 
-    struct BinaryReader binaryReader;
-    CreateBinaryReader(&binaryReader, buffer, length);
-
-    struct Interpreter interpreter;
+    Interpreter interpreter;
 
     CreateInterpreter(&interpreter);
 
     LoadProgramIntoInterpreter(&interpreter, buffer, length, NORMAL_PROGRAM_START);
 
-    //InterpreteROM(&interpreter, &binaryReader);    
+    RunProgramFromInterpreter(&interpreter);
 
     DestroyIntepreter(&interpreter);
 

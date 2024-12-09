@@ -1,59 +1,30 @@
 #include "chip8/intepreter.h"
 
-void CreateInterpreter(struct Interpreter* interpreter) {   
+void CreateInterpreter(Interpreter* interpreter) {   
     interpreter->memory = malloc(4096);
-    interpreter->PC = 0;
-    interpreter->I = 0; 
+    interpreter->visual_memory = malloc(64 * 32);
+    interpreter->V = malloc(16);
+    interpreter->PC = NORMAL_PROGRAM_START;
+    interpreter->I = 0;
+    interpreter->program_length = 0;
 }
 
-void RunProgramFromInterpreter(struct Interpreter* interpreter, struct BinaryReader* binaryReader) {
-    while (binaryReader->eob == 0) {
-        
-        uint8 nibble = ReadNibble(binaryReader);
+void RunProgramFromInterpreter(Interpreter* interpreter) {
+    
+    WriteMemoryPointer(interpreter, NORMAL_PROGRAM_START);
+    // will change
+    while (interpreter->PC < interpreter->program_length + NORMAL_PROGRAM_START) {
 
-        if (nibble == -1)
-            return;
+        uint8 instruction[4];
+        ConvertCurrentOptcodeToInstruction(interpreter, instruction);
 
-        if (nibble == 0xA) {
-            uint16 memory_pointer = ReadByte(binaryReader);
+        if (instruction[0] == 0x1) {
 
-            WriteMemoryPointer(interpreter, memory_pointer);
-        }
-        if (nibble == 0xB) {
-            uint16 memory_pointer = interpreter->I + ReadVariable(interpreter, 0x0); 
-
-            WriteMemoryPointer(interpreter, memory_pointer);
-        }
-        if (nibble == 0xC) {
-            uint8 variable = ReadNibble(binaryReader);
-            uint8 number = ReadByte(binaryReader);
-
-            WriteVariable(interpreter, variable, ((rand() % 255 - 0 + 1) + 1) & number);
-        }
-
-        if (nibble == 0x6) {
-            uint8 variable = ReadNibble(binaryReader);
-
-            uint8 high_nibble = ReadNibble(binaryReader);
-            uint8 low_nibble = ReadNibble(binaryReader);
-
-            uint8 value = (high_nibble << 4) | low_nibble;
-
-            WriteVariable(interpreter, variable, value);
-        }
-        if (nibble == 0xD) {
-            //display
-            uint8 x_pos = ReadVariable(interpreter, ReadNibble(binaryReader));
-            uint8 y_pos = ReadVariable(interpreter, ReadNibble(binaryReader));
-
-            uint8 height = ReadNibble(binaryReader);
-
-            DrawSprite(x_pos, y_pos, height);
         }
     }
 }
 
-void LoadProgramIntoInterpreter(struct Interpreter* interpreter, char* program, uint32 program_length, uint16 memory_offset) {
+void LoadProgramIntoInterpreter(Interpreter* interpreter, char* program, uint32 program_length, uint16 memory_offset) {
 
     printf("Writing program to interpreter, size: %u bytes\n", program_length);
 
@@ -62,41 +33,46 @@ void LoadProgramIntoInterpreter(struct Interpreter* interpreter, char* program, 
         WriteMemoryAddress(interpreter, program[i]);
     }
     WriteMemoryPointer(interpreter, memory_offset);
-    printf("Wrote %u bytes to interpreter", program_length);
+    interpreter->program_length = program_length;
+    printf("Wrote %u bytes to interpreter\n", program_length);
 }
 
-void WriteMemoryAddress(struct Interpreter* interpreter, uint8 memory) {
+void WriteMemoryAddress(Interpreter* interpreter, uint8 memory) {
     interpreter->memory[interpreter->I] = memory;
-
-    printf("Memory at pointer wrote to %02X\n", interpreter->memory[interpreter->I]);
 }
 
-uint8 ReadMemoryAddress(struct Interpreter* interpreter) {
+uint8 ReadMemoryAddress(Interpreter* interpreter) {
     return interpreter->memory[interpreter->I];
 }
 
-void WriteMemoryPointer(struct Interpreter* interpreter, uint16 pointer) {
-    interpreter->I = pointer;
-
-    printf("Memory pointer set to: %X\n", pointer);
+uint8 ReadSpecifiedMemoryAddress(Interpreter* interpreter, uint16 memory_address) {
+    return interpreter->memory[memory_address];
 }
 
-uint16 ReadMemoryPointer(struct Interpreter* interpreter) {
+void WriteMemoryPointer(Interpreter* interpreter, uint16 pointer) {
+    interpreter->I = pointer;
+}
+
+uint16 ReadMemoryPointer(Interpreter* interpreter) {
     return (interpreter->I);
 }
 
-void WriteVariable(struct Interpreter* interpreter, uint8 variable, uint8 value) {   
-    interpreter->memory[variable] = value;
+void WriteVariable(Interpreter* interpreter, uint8 variable, uint8 value) {   
+    interpreter->V[variable] = value;
 
     printf("Variable %X set to %02X\n", variable, (int32)interpreter->memory[variable]);
 }
 
-uint8 ReadVariable(struct Interpreter* interpreter, uint8 variable) {
-    uint8 value = interpreter->memory[variable];
+uint8 ReadVariable(Interpreter* interpreter, uint8 variable) {
+    uint8 value = interpreter->V[variable];
 
     printf("Variable %X read as %02X\n", variable, value);
 
     return value;
+}
+
+void AdvanceProgramCounter(Interpreter* interpreter) {
+    interpreter->PC++;
 }
 
 void DrawSprite(uint8 x, uint8 y, uint8 height) {
@@ -104,6 +80,22 @@ void DrawSprite(uint8 x, uint8 y, uint8 height) {
     printf("Sprite drawn at (%X, %X)\n", x, y);
 }
 
-void DestroyIntepreter(struct Interpreter* interpreter) {
+void ConvertCurrentOptcodeToInstruction(Interpreter* interpreter, uint8* instruction) {
+    // reads the next two bytes, the optcode
+    uint8 high_byte = ReadSpecifiedMemoryAddress(interpreter, interpreter->PC);
+    AdvanceProgramCounter(interpreter);
+    uint8 low_byte = ReadSpecifiedMemoryAddress(interpreter, interpreter->PC);
+    AdvanceProgramCounter(interpreter);
+    
+    // converts the optcode into 4 uint8's that are the instruction
+    instruction[0] = (high_byte >> 4) & 0x0F;
+    instruction[1] =  high_byte       & 0x0F;
+    instruction[2] = (low_byte  >> 4) & 0x0F;
+    instruction[3] =  low_byte        & 0x0F;
+}
+
+void DestroyIntepreter(Interpreter* interpreter) {
     free(interpreter->memory);
+    free(interpreter->visual_memory);
+    free(interpreter->V);
 }
