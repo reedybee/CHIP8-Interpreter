@@ -1,6 +1,6 @@
 #include <util/binaryReader.h>
 
-void CreateBinaryReader (struct BinaryReader* binaryReader, char* file, size_t file_size) {
+void CreateBinaryReader (struct BinaryReader* binaryReader, char* file, uint32 file_size) {
     binaryReader->buffer = file;
     binaryReader->pointer = 0;
     binaryReader->eob = 0;
@@ -8,7 +8,7 @@ void CreateBinaryReader (struct BinaryReader* binaryReader, char* file, size_t f
     binaryReader->nibble_flag = 0;
 }
 
-void AdvancePointer(struct BinaryReader* binaryReader, int numberToAdvance) {
+void AdvancePointer(struct BinaryReader* binaryReader, uint32 numberToAdvance) {
     binaryReader->pointer += numberToAdvance;
 }
 
@@ -34,7 +34,7 @@ char ReadNibble(struct BinaryReader* binaryReader) {
     return nibble;
 }
 
-char ReadSpecifiedNibble(struct BinaryReader* binaryReader, unsigned int pointer, unsigned int what_nibble) {
+char ReadSpecifiedNibble(struct BinaryReader* binaryReader, uint32 pointer, uint32 what_nibble) {
     if (pointer >= binaryReader->buffer_size) {
         printf("Cannot read past size of buffer");
         return 0;

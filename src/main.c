@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     }
 
     fseek(file, 0L, SEEK_END);    
-    int length = ftell(file);
+    uint32 length = ftell(file);
     rewind(file);
 
     char* buffer = malloc(length + 1);
@@ -28,7 +28,9 @@ int main(int argc, char* argv[]) {
 
     CreateInterpreter(&interpreter);
 
-    InterpreteROM(&interpreter, &binaryReader);    
+    LoadProgramIntoInterpreter(&interpreter, buffer, length, NORMAL_PROGRAM_START);
+
+    //InterpreteROM(&interpreter, &binaryReader);    
 
     DestroyIntepreter(&interpreter);
 
