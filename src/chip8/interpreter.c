@@ -1,4 +1,4 @@
-#include "chip8/intepreter.h"
+#include "chip8/interpreter.h"
 
 void CreateInterpreter(Interpreter* interpreter) {   
     interpreter->memory = malloc(4096);
@@ -18,8 +18,25 @@ void RunProgramFromInterpreter(Interpreter* interpreter) {
         uint8 instruction[4];
         ConvertCurrentOptcodeToInstruction(interpreter, instruction);
 
+        // jump to memory address
         if (instruction[0] == 0x1) {
-
+            WriteMemoryPointer(interpreter, ConvertInstructionToMemoryAddress(instruction));
+        }
+        //
+        if (instruction[0] == 0x2) {
+            // calls routine at memory pointer
+        }
+        // skips next optcode if VX equals some constant
+        if (instruction[0] == 0x3) {
+            if (ReadVariable(interpreter, instruction[1]) == ConvertFromUint8ToUint16(instruction[2], instruction[3])) {
+                SkipOptcode(interpreter);
+            }
+        }
+        // skips next optcode if VX does not equal some constant
+        if (instruction[0] == 0x4) {
+            if (ReadVariable(interpreter, instruction[1]) != ConvertFromUint8ToUint16(instruction[2], instruction[3])) {
+                SkipOptcode(interpreter);
+            }
         }
     }
 }
@@ -75,6 +92,11 @@ void AdvanceProgramCounter(Interpreter* interpreter) {
     interpreter->PC++;
 }
 
+void SkipOptcode(Interpreter* interpreter) {
+    AdvanceProgramCounter(interpreter);
+    AdvanceProgramCounter(interpreter);
+}
+
 void DrawSprite(uint8 x, uint8 y, uint8 height) {
     //
     printf("Sprite drawn at (%X, %X)\n", x, y);
@@ -92,6 +114,11 @@ void ConvertCurrentOptcodeToInstruction(Interpreter* interpreter, uint8* instruc
     instruction[1] =  high_byte       & 0x0F;
     instruction[2] = (low_byte  >> 4) & 0x0F;
     instruction[3] =  low_byte        & 0x0F;
+}
+
+uint16 ConvertInstructionToMemoryAddress(uint8* instruction) {
+    uint16 address = (((instruction[1] << 4) | instruction[2]) << 4) | instruction[3];
+    return address;
 }
 
 void DestroyIntepreter(Interpreter* interpreter) {

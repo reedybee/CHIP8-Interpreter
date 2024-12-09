@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "chip8/intepreter.h"
+#include "chip8/interpreter.h"
 
 int main(int argc, char* argv[]) {
 
